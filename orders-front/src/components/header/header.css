@@ -1,0 +1,35 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-bottom: 0.5px #0000003e solid;
+}
+
+.header-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+.header-cart {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-cart svg {
+  width: 22px;
+  height: 22px;
+  color: #1a1a1a;
+}
+
+.header-cart:hover svg {
+  color: #333;
+}
