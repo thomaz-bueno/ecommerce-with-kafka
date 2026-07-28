@@ -1,0 +1,13 @@
+const productsService = require('../services/products.service.js');
+
+const listProducts = async (req, res) => {
+    try {
+        const result = await productsService.listProducts();
+
+        return res.status(200).json(result);
+    } catch(err) {
+        return res.status(500).json({ erro: err.message })
+    }
+}
+
+module.exports = { listProducts };
