@@ -16,4 +16,13 @@ const listProducts = async () => {
     return productsWithImages;
 };
 
-module.exports = { listProducts };
+const listOneProduct = async (id) => {
+    const product = await productsRepository.listOneProduct(id);
+
+    const imageKey = `imagens/${product.id}/image.png`;
+    const image_url = await s3Service.getSignedUrlByKey(imageKey);
+
+    return { ...product, image_url };
+}
+
+module.exports = { listProducts, listOneProduct };
