@@ -1,8 +1,14 @@
-import { useState } from 'react'
-import tenis from '../../assets/tenis.png'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import './product.css'
 
-const thumbnails = [tenis, tenis, tenis, tenis]
+interface ProductData {
+  id: number
+  name: string
+  description: string
+  base_price: string
+  image_url: string
+}
 
 const colors = [
   { name: 'White', bg: '#d6cfc5' },
@@ -13,9 +19,28 @@ const colors = [
 const sizes = ['40.5', '41', '42', '43', '43.5', '44', '44.5', '45', '46']
 
 function Product() {
+  const { id } = useParams()
+  const [product, setProduct] = useState<ProductData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState('41')
   const [selectedColor, setSelectedColor] = useState(0)
   const [activeThumb, setActiveThumb] = useState(0)
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/products/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Erro ao buscar produto')
+        return res.json()
+      })
+      .then((data) => setProduct(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  if (loading) return <p>Carregando produto...</p>
+  if (error) return <p>{error}</p>
+  if (!product) return null
 
   return (
     <div className="product-page">
@@ -24,22 +49,22 @@ function Product() {
         <span>/</span>
         <a href="#">Shoes</a>
         <span>/</span>
-        <a href="#">DQ</a>
+        <a href="#">{product.name}</a>
       </nav>
 
       <div className="product-layout">
         <div className="product-gallery">
           <div className="main-image">
-            <img src={tenis} alt="Shoes DQ Zig Kinetica 3" />
+            <img src={product.image_url} alt={product.name} />
           </div>
           <div className="thumbnails">
-            {thumbnails.map((src, i) => (
+            {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
                 className={`thumbnail ${i === activeThumb ? 'active' : ''}`}
                 onClick={() => setActiveThumb(i)}
               >
-                <img src={src} alt={`Thumbnail ${i + 1}`} />
+                <img src={product.image_url} alt={`Thumbnail ${i + 1}`} />
               </div>
             ))}
             <span className="thumbnail-more">+4 more</span>
@@ -47,12 +72,12 @@ function Product() {
         </div>
 
         <div className="product-info">
-          <div className="brand-row">  
-            <span className="brand-name">DQ</span>
-            <span className="sku">HR1325R00--8</span>
+          <div className="brand-row">
+            <span className="brand-name">{product.name}</span>
+            <span className="sku">ID: {product.id}</span>
           </div>
 
-          <h1 className="product-title">Shoes DQ Zig Kinetica 3</h1>
+          <h1 className="product-title">{product.name}</h1>
 
           <div className="rating">
             <div className="stars">
@@ -65,7 +90,7 @@ function Product() {
             <span className="reviews-count">42 reviews</span>
           </div>
 
-          <div className="price">$199.00</div>
+          <div className="price">R$ {product.base_price}</div>
 
           <div className="color-selector">
             <div className="color-label">

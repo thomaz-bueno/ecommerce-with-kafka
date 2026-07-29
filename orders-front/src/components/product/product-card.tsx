@@ -10,7 +10,7 @@ export interface ProductProps {
 
 function ProductCard({ id, name, base_price, image_url }: ProductProps) {
   return (
-    <Link to="/product" className="product-card">
+    <Link to={`/product/${id}`} className="product-card">
       <div className="product-card-image">
         <img src={image_url} alt={name} />
       </div>
