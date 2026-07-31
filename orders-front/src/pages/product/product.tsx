@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
 import './product.css'
 
 interface ProductData {
@@ -20,6 +21,8 @@ const sizes = ['40.5', '41', '42', '43', '43.5', '44', '44.5', '45', '46']
 
 function Product() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
   const [product, setProduct] = useState<ProductData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -129,7 +132,15 @@ function Product() {
           </div>
 
           <div className="product-actions">
-            <button className="add-to-cart">
+            <button
+              className="add-to-cart"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate('/login')
+                  return
+                }
+              }}
+            >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
                 <line x1="3" y1="6" x2="21" y2="6" />

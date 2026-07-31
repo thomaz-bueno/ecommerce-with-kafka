@@ -14,6 +14,12 @@
   display: block;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .header-cart {
   background: none;
   border: none;
@@ -32,4 +38,95 @@
 
 .header-cart:hover svg {
   color: #333;
+}
+
+.header-user {
+  position: relative;
+}
+
+.header-user-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.header-user-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111;
+  text-transform: uppercase;
+}
+
+.header-user-arrow {
+  width: 16px;
+  height: 16px;
+  color: #111;
+  transition: transform 0.2s;
+}
+
+.header-user-arrow.open {
+  transform: rotate(180deg);
+}
+
+.header-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.header-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #c00;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+
+.header-dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.header-dropdown-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.header-login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  background: transparent;
+  border: 1.5px solid #111;
+
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s;
+}
+
+.header-login-btn:hover {
+  background: #111;
+  color: #fff;
 }
