@@ -27,4 +27,21 @@ const listOneProduct = async (id) => {
     return result.rows[0];
 }
 
-module.exports = { listProducts, listOneProduct };
+const getProductVariants = async (id) => {
+    const result = await pool.query(`
+        SELECT
+            v.id,
+            v.product_id,
+            v.color,
+            v.size,
+            v.price,
+            v.stock
+        FROM product_variants v
+        WHERE v.product_id = $1
+        ORDER BY v.id ASC
+    `, [id]);
+
+    return result.rows;
+}
+
+module.exports = { listProducts, listOneProduct, getProductVariants };

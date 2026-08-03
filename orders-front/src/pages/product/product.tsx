@@ -9,15 +9,23 @@ interface ProductData {
   description: string
   base_price: string
   image_url: string
+  selectedColor: string
+  availableColors: string[]
+  variants: {
+    id: number
+    product_id: number
+    color: string
+    size: string
+    price: string
+    stock: number
+  }[]
 }
 
-const colors = [
-  { name: 'White', bg: '#d6cfc5' },
-  { name: 'Gray', bg: '#b8b8b8' },
-  { name: 'Dark', bg: '#3a3a3a' },
-]
-
-const sizes = ['40.5', '41', '42', '43', '43.5', '44', '44.5', '45', '46']
+const colorMap: Record<string, string> = {
+  white: '#d6cfc5',
+  gray: '#b8b8b8',
+  black: '#3a3a3a',
+}
 
 function Product() {
   const { id } = useParams()
@@ -26,12 +34,14 @@ function Product() {
   const [product, setProduct] = useState<ProductData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedSize, setSelectedSize] = useState('41')
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [selectedColor, setSelectedColor] = useState(0)
   const [activeThumb, setActiveThumb] = useState(0)
+  const [color, setColor] = useState('');
+  const [quantity, setQuantity] = useState(1)
 
   useEffect(() => {
-    fetch(`http://localhost:3000/products/${id}`)
+    fetch(`http://localhost:3000/products/${id}?color=${color}`,)
       .then((res) => {
         if (!res.ok) throw new Error('Erro ao buscar produto')
         return res.json()
@@ -39,11 +49,13 @@ function Product() {
       .then((data) => setProduct(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, color])
 
   if (loading) return <p>Carregando produto...</p>
   if (error) return <p>{error}</p>
   if (!product) return null
+
+  const sizes = [...new Set(product.variants.map((v) => v.size))]
 
   return (
     <div className="product-page">
@@ -97,16 +109,16 @@ function Product() {
 
           <div className="color-selector">
             <div className="color-label">
-              Color <span>/</span> <span>{colors[selectedColor].name}</span>
+              Color <span>/</span> <span>{product.availableColors[selectedColor]}</span>
             </div>
             <div className="color-options">
-              {colors.map((c, i) => (
+              {product.availableColors.map((c, i) => (
                 <div
-                  key={i}
+                  key={c}
                   className={`color-swatch ${i === selectedColor ? 'active' : ''}`}
-                  onClick={() => setSelectedColor(i)}
+                  onClick={() => { setSelectedColor(i); setColor(c) }}
                 >
-                  <div style={{ backgroundColor: c.bg }} />
+                  <div style={{ backgroundColor: colorMap[c] }} />
                 </div>
               ))}
             </div>

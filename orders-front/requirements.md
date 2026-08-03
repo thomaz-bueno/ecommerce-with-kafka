@@ -1,10 +1,8 @@
 ## TASKs ## 
 
-- Trazer as especificações do produto na '/product'
-- Colocar input numérico de quantidade ex: [-][0][+]
-- Fazer zoom no hover da imagem
-- Criar Checkout Page
+- Fazer Cart Page
 - Colocar uma modal como resposta de adicionado no carrinho
+- Criar Checkout Page
 - Integrar endpoint '/order'
 - Colocar uma modal como resposta de pedido finalizado
 - Fazer footer com github
