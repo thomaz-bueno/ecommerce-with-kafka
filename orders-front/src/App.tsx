@@ -5,6 +5,7 @@ import Home from './pages/home/home'
 import Product from './pages/product/product'
 import Login from './pages/login/login'
 import Register from './pages/register/register'
+import Cart from './pages/cart/cart'
 import ProtectedRoute from './components/protected-route/protected-route'
 
 function AppRoutes() {
@@ -21,7 +22,7 @@ function AppRoutes() {
         <Route path="/register" element={<Register />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/cart" element={<div>Carrinho</div>} />
+          <Route path="/cart" element={<Cart />} />
         </Route>
       </Routes>
     </>

@@ -38,7 +38,6 @@ function Product() {
   const [selectedColor, setSelectedColor] = useState(0)
   const [activeThumb, setActiveThumb] = useState(0)
   const [color, setColor] = useState('');
-  const [quantity, setQuantity] = useState(1)
 
   useEffect(() => {
     fetch(`http://localhost:3000/products/${id}?color=${color}`,)

@@ -1,8 +1,8 @@
 ## TASKs ## 
 
-- Fazer Cart Page
 - Colocar uma modal como resposta de adicionado no carrinho
-- Criar Checkout Page
+- Fazer dot em cima do svg de carrinho header, mostrando quantos itens tem adicionados
+- Integrar API de carrinho, favoritos
 - Integrar endpoint '/order'
 - Colocar uma modal como resposta de pedido finalizado
 - Fazer footer com github
