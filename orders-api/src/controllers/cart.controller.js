@@ -12,7 +12,8 @@ const getCartItems = async (req, res) => {
 
 const addCartItem = async (req, res) => {
     try {
-        const result = await cartService.addCartItem(req.body);
+        const user_id = req.user.id;
+        const result = await cartService.addCartItem({ user_id, ...req.body });
 
         return res.status(200).json(result);
     } catch(err) {

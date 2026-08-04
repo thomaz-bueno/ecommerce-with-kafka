@@ -17,6 +17,12 @@ const getCartItems = async ({ id }) => {
 }
 
 const addCartItem = async ({ user_id, product_id, name, price, color, size, quantity }) => {
+    const hasCart = await cartRepository.hasInCart({ user_id, product_id });
+
+    if(hasCart.length > 0) {
+        return { message: "Produto já adicionado" };
+    }
+
     const itemAdded = await cartRepository.addCartItem({ user_id, product_id, name, price, color, size, quantity });
 
     return itemAdded;

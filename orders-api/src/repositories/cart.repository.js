@@ -28,4 +28,22 @@ const addCartItem = async ({ user_id, product_id, name, price, color, size, quan
     return result.rows[0];
 }
 
-module.exports = { getCartItems, addCartItem };
+const hasInCart = async ({ user_id, product_id }) => {
+    const result = await pool.query(`
+        SELECT 
+            c.id,
+            c.product_id,
+            c.name,
+            c.price,
+            c.color,
+            c.size,
+            c.quantity,
+            c.is_liked
+        FROM cart c
+        WHERE c.user_id = $1 AND c.product_id = $2;
+    `, [user_id, product_id]);
+    
+    return result.rows;
+}
+
+module.exports = { getCartItems, addCartItem, hasInCart };
