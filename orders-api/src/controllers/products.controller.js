@@ -14,7 +14,6 @@ const listOneProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const { color } = req.query;
-        console.log(color);
         const result = await productsService.listOneProduct({ id, color });
 
         return res.status(200).json(result);
