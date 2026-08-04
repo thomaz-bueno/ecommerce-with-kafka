@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal'
 import './product.css'
 
 interface ProductData {
@@ -37,7 +38,8 @@ function Product() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [selectedColor, setSelectedColor] = useState(0)
   const [activeThumb, setActiveThumb] = useState(0)
-  const [color, setColor] = useState('');
+  const [color, setColor] = useState('white');
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     fetch(`http://localhost:3000/products/${id}?color=${color}`,)
@@ -50,14 +52,66 @@ function Product() {
       .finally(() => setLoading(false))
   }, [id, color])
 
+  useEffect(() => {
+    if (product && selectedSize === null) {
+      const firstSize = [...new Set(product.variants.map((v) => v.size))][0]
+      if (firstSize) setSelectedSize(firstSize)
+    }
+  }, [product, selectedSize])
+
   if (loading) return <p>Carregando produto...</p>
   if (error) return <p>{error}</p>
   if (!product) return null
 
   const sizes = [...new Set(product.variants.map((v) => v.size))]
 
+  function addToCart() {
+    const price = parseFloat(product!.base_price)
+
+    fetch('http://localhost:3000/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        product_id: product!.id,
+        name: product!.name,
+        price,
+        color,
+        size: selectedSize,
+        quantity: 1,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Erro ao adicionar no carrinho')
+        return res.json()
+      })
+      .then((data) => {
+        console.log('Adicionado com sucesso:', data)
+        setIsModalOpen(true)
+      })
+      .catch((err) => setError(err.message))
+  }
+
   return (
     <div className="product-page">
+      <AddToCartModal
+        isOpen={isModalOpen}
+        product={{
+          name: product.name,
+          category: "Shoe",
+          color,
+          size: selectedSize || '',
+          price: `R$ ${product.base_price}`,
+          image_url: product.image_url,
+        }}
+        onClose={() => setIsModalOpen(false)}
+        onGoToCart={() => {
+          setIsModalOpen(false)
+          navigate('/cart')
+        }}
+        onContinueShopping={() => setIsModalOpen(false)}
+      />
+
       <nav className="breadcrumb">
         <a href="#">Clothes and shoes</a>
         <span>/</span>
@@ -150,6 +204,7 @@ function Product() {
                   navigate('/login')
                   return
                 }
+                addToCart()
               }}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

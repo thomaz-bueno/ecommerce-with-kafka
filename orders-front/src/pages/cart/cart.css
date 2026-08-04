@@ -305,13 +305,18 @@
 }
 
 .member-btn {
-  background-color: #111;
-  color: #fff;
+  background-color: transparent;
+  color: #111;
+  border: 1px solid #111;
+  transition: all 0.5 ease;
 }
 
 .member-btn:hover {
-  background-color: #333;
+  transition: all 0.5 ease;
+  border-color: #ccc;
+  color: #111111ae;
 }
+
 
 /* ========== RESPONSIVE ========== */
 
