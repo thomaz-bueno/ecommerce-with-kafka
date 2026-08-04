@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { useCart } from '../../contexts/CartContext'
 import AddToCartModal from '../../components/add-to-cart-modal/add-to-cart-modal'
 import './product.css'
 
@@ -30,6 +31,7 @@ const colorMap: Record<string, string> = {
 
 function Product() {
   const { id } = useParams()
+  const { fetchCart } = useCart()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const [product, setProduct] = useState<ProductData | null>(null)
@@ -85,8 +87,8 @@ function Product() {
         if (!res.ok) throw new Error('Erro ao adicionar no carrinho')
         return res.json()
       })
-      .then((data) => {
-        console.log('Adicionado com sucesso:', data)
+      .then(() => {
+        fetchCart()
         setIsModalOpen(true)
       })
       .catch((err) => setError(err.message))

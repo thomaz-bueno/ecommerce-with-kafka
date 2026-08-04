@@ -28,6 +28,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background-color: #e53e3e;
+  border-radius: 50%;
 }
 
 .header-cart svg {
