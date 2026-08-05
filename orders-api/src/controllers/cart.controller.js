@@ -2,7 +2,8 @@ const cartService = require('../services/cart.service.js');
 
 const getCartItems = async (req, res) => {
     try {
-        const result = await cartService.getCartItems(req.body);
+        const user_id = req.user.id
+        const result = await cartService.getCartItems(user_id);
 
         return res.status(200).json(result);
     } catch(err) {

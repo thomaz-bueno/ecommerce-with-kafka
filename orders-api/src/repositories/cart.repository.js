@@ -15,7 +15,7 @@ const getCartItems = async (id) => {
         LEFT JOIN favorites f
             ON f.product_id = c.product_id
             AND f.user_id = c.user_id
-        WHERE c.user_id = $1;
+        WHERE c.user_id = $1::UUID;
     `, [id]);
 
     return result.rows;

@@ -1,9 +1,9 @@
 const cartRepository = require('../repositories/cart.repository.js');
 const s3Service = require('./s3.service.js');
 
-const getCartItems = async ({ id }) => {
+const getCartItems = async (id) => {
     const items = await cartRepository.getCartItems(id);
-    
+
     const itemsWithImages = await Promise.all(
         items.map(async (item) => {
             const imageKey = `imagens/${item.product_id}/${item.color}.png`;

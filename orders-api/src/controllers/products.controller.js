@@ -16,7 +16,6 @@ const listOneProduct = async (req, res) => {
         const { id } = req.params;
         const { color } = req.query;
         const user_id = req.user?.id || null;
-        console.log('UserID: ' + user_id);
         const result = await productsService.listOneProduct({ id, color, user_id });
 
         return res.status(200).json(result);

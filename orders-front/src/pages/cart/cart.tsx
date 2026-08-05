@@ -22,10 +22,7 @@ function Cart() {
     const userId = localStorage.getItem('userId')
 
     fetch('http://localhost:3000/cart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ id: userId }),
     })
       .then((res) => res.json())
       .then((data) => setItems(data))

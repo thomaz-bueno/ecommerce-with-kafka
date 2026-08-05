@@ -28,14 +28,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([])
 
     function fetchCart() {
-        const userId = localStorage.getItem('userId')
-        if (!userId) return
 
         fetch('http://localhost:3000/cart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ id: userId }),
         })
             .then((res) => res.json())
             .then((data) => setItems(data))
