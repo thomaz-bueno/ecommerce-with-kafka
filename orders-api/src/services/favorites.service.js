@@ -1,4 +1,5 @@
 const favoritesRepository = require('../repositories/favorites.repository.js');
+const s3Service = require('./s3.service.js');
 
 const toggleFavorite = async ({ user_id, product_id }) => {
     const existing = await favoritesRepository.findByUserAndProduct({ user_id, product_id });
@@ -14,7 +15,17 @@ const toggleFavorite = async ({ user_id, product_id }) => {
 
 const listFavorites = async (user_id) => {
     const favorites = await favoritesRepository.listByUser(user_id);
-    return favorites;
+
+    const favoritesWithImages = await Promise.all(
+        favorites.map(async (favorite) => {
+            const imageKey = `imagens/${favorite.product_id}/white.png`;
+            const image_url = await s3Service.getSignedUrlByKey(imageKey);
+
+            return { ...favorite, image_url };
+        })
+    );
+
+    return favoritesWithImages;
 }
 
-module.exports = { toggleFavorite };
+module.exports = { toggleFavorite, listFavorites };

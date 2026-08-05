@@ -2,7 +2,8 @@ const productsService = require('../services/products.service.js');
 
 const listProducts = async (req, res) => {
     try {
-        const result = await productsService.listProducts();
+        const user_id = req.user?.id || null;
+        const result = await productsService.listProducts(user_id);
 
         return res.status(200).json(result);
     } catch(err) {
@@ -14,7 +15,9 @@ const listOneProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const { color } = req.query;
-        const result = await productsService.listOneProduct({ id, color });
+        const user_id = req.user?.id || null;
+        console.log('UserID: ' + user_id);
+        const result = await productsService.listOneProduct({ id, color, user_id });
 
         return res.status(200).json(result);
     } catch(err) {

@@ -1,8 +1,8 @@
 const productsRepository = require('../repositories/products.repository.js');
 const s3Service = require('../services/s3.service.js');
 
-const listProducts = async () => {
-    const products = await productsRepository.listProducts();
+const listProducts = async (user_id) => {
+    const products = await productsRepository.listProducts(user_id);
 
     const productsWithImages = await Promise.all(
         products.map(async (product) => {
@@ -16,8 +16,8 @@ const listProducts = async () => {
     return productsWithImages;
 };
 
-const listOneProduct = async ({ id, color }) => {
-    const product = await productsRepository.listOneProduct(id);
+const listOneProduct = async ({ id, color, user_id }) => {
+    const product = await productsRepository.listOneProduct(id, user_id);
     const variants = await productsRepository.getProductVariants(id);
 
     const availableColors = [...new Set(variants.map(v => v.color))];
