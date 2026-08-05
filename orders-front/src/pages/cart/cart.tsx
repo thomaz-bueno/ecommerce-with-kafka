@@ -46,6 +46,7 @@ function Cart() {
           {items.map((item) => (
             <CartItem
               key={item.id}
+              product_id={item.product_id}
               image_url={item.image_url}
               name={item.name}
               color={item.color}

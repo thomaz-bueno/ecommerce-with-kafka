@@ -1,6 +1,8 @@
+import { useState, useEffect, useRef } from 'react'
 import './cart-item.css'
 
 interface CartItemProps {
+  product_id: number
   image_url: string
   name: string
   color: string
@@ -10,9 +12,39 @@ interface CartItemProps {
   is_liked: boolean
 }
 
-function CartItem({ image_url, name, color, size, quantity, price, is_liked }: CartItemProps) {
+function CartItem({ product_id, image_url, name, color, size, quantity, price, is_liked }: CartItemProps) {
   const totalPrice = (parseFloat(price) * quantity).toFixed(2)
   const capitalizedColor = color.charAt(0).toUpperCase() + color.slice(1)
+  const [isLiked, setIsLiked] = useState(is_liked)
+  const isToggling = useRef(false)
+
+  useEffect(() => {
+    setIsLiked(is_liked)
+  }, [is_liked])
+
+  function toggleFavorite() {
+    if (isToggling.current) return
+    isToggling.current = true
+
+    setIsLiked((prev) => !prev)
+
+    fetch('http://localhost:3000/favorites/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ product_id: product_id }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Erro ao favoritar')
+        return res.json()
+      })
+      .catch(() => {
+        setIsLiked((prev) => !prev)
+      })
+      .finally(() => {
+        isToggling.current = false
+      })
+  }
 
   return (
     <>
@@ -45,8 +77,8 @@ function CartItem({ image_url, name, color, size, quantity, price, is_liked }: C
           </div>
 
           <div className="item-actions">
-            <button className="action-icon" aria-label="Add to favorites">
-              <svg viewBox="0 0 24 24" fill={is_liked ? '#e53e3e' : 'none'} stroke="currentColor" strokeWidth="1.5">
+            <button className="action-icon" aria-label="Add to favorites" onClick={toggleFavorite}>
+              <svg viewBox="0 0 24 24" fill={isLiked ? '#e53e3e' : 'none'} stroke="currentColor" strokeWidth="1.5">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </button>

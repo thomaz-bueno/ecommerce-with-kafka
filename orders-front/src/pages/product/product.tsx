@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../contexts/CartContext'
@@ -11,6 +11,7 @@ interface ProductData {
   description: string
   base_price: string
   image_url: string
+  is_liked: boolean
   selectedColor: string
   availableColors: string[]
   variants: {
@@ -42,6 +43,8 @@ function Product() {
   const [activeThumb, setActiveThumb] = useState(0)
   const [color, setColor] = useState('white');
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLiked, setIsLiked] = useState(false)
+  const isToggling = useRef(false)
 
   useEffect(() => {
     fetch(`http://localhost:3000/products/${id}?color=${color}`, {
@@ -62,6 +65,10 @@ function Product() {
       if (firstSize) setSelectedSize(firstSize)
     }
   }, [product, selectedSize])
+
+  useEffect(() => {
+    if (product) setIsLiked(product.is_liked)
+  }, [product])
 
   if (loading) return <p>Carregando produto...</p>
   if (error) return <p>{error}</p>
@@ -94,6 +101,30 @@ function Product() {
         setIsModalOpen(true)
       })
       .catch((err) => setError(err.message))
+  }
+
+  function toggleFavorite() {
+    if (isToggling.current) return
+    isToggling.current = true
+
+    setIsLiked((prev) => !prev)
+
+    fetch('http://localhost:3000/favorites/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ product_id: product.id }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Erro ao favoritar')
+        return res.json()
+      })
+      .catch(() => {
+        setIsLiked((prev) => !prev)
+      })
+      .finally(() => {
+        isToggling.current = false
+      })
   }
 
   return (
@@ -218,8 +249,10 @@ function Product() {
               </svg>
               Add to cart
             </button>
-            <button className="wishlist-btn">
-              <i className="far fa-heart" />
+            <button className="wishlist-btn" onClick={toggleFavorite}>
+              <svg viewBox="0 0 24 24" fill={isLiked ? '#e53e3e' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
             </button>
           </div>
 
