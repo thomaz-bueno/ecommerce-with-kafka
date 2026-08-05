@@ -10,8 +10,11 @@ const getCartItems = async (id) => {
             c.color,
             c.size,
             c.quantity,
-            c.is_liked
+            COALESCE(f.id IS NOT NULL) AS is_liked
         FROM cart c
+        LEFT JOIN favorites f
+            ON f.product_id = c.product_id
+            AND f.user_id = c.user_id
         WHERE c.user_id = $1;
     `, [id]);
 
@@ -37,8 +40,7 @@ const hasInCart = async ({ user_id, product_id }) => {
             c.price,
             c.color,
             c.size,
-            c.quantity,
-            c.is_liked
+            c.quantity
         FROM cart c
         WHERE c.user_id = $1 AND c.product_id = $2;
     `, [user_id, product_id]);
