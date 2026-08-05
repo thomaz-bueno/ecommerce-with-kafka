@@ -44,7 +44,9 @@ function Product() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    fetch(`http://localhost:3000/products/${id}?color=${color}`,)
+    fetch(`http://localhost:3000/products/${id}?color=${color}`, {
+      credentials: 'include',
+    })
       .then((res) => {
         if (!res.ok) throw new Error('Erro ao buscar produto')
         return res.json()

@@ -6,6 +6,7 @@
   width: calc(100% - 48px);
   background: transparent;
   box-shadow: none;
+  margin: auto;
 }
 
 .atc-modal::backdrop {

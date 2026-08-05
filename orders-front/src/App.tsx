@@ -7,6 +7,7 @@ import Product from './pages/product/product'
 import Login from './pages/login/login'
 import Register from './pages/register/register'
 import Cart from './pages/cart/cart'
+import Favorites from './pages/favorites/favorites'
 import ProtectedRoute from './components/protected-route/protected-route'
 
 function AppRoutes() {
@@ -21,6 +22,7 @@ function AppRoutes() {
         <Route path="/product/:id" element={<Product />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/favorites" element={<Favorites />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<Cart />} />
