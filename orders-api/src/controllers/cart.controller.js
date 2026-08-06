@@ -22,4 +22,39 @@ const addCartItem = async (req, res) => {
     }
 }
 
-module.exports = { getCartItems, addCartItem };
+const updateQuantity = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const { cart_item_id, quantity } = req.body;
+        const result = await cartService.updateQuantity({ user_id, cart_item_id, quantity });
+
+        return res.status(200).json(result);
+    } catch(err) {
+        return res.status(500).json({ erro: err.message });
+    }
+}
+
+const removeItem = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const { id } = req.params;
+        const result = await cartService.removeItem({ user_id, cart_item_id: id });
+
+        return res.status(200).json(result);
+    } catch(err) {
+        return res.status(500).json({ erro: err.message });
+    }
+}
+
+const clearCart = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+        const result = await cartService.clearCart(user_id);
+
+        return res.status(200).json(result);
+    } catch(err) {
+        return res.status(500).json({ erro: err.message });
+    }
+}
+
+module.exports = { getCartItems, addCartItem, updateQuantity, removeItem, clearCart };

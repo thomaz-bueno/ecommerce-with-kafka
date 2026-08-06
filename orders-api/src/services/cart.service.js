@@ -28,4 +28,36 @@ const addCartItem = async ({ user_id, product_id, name, price, color, size, quan
     return itemAdded;
 }
 
-module.exports = { getCartItems, addCartItem };
+const updateQuantity = async ({ user_id, cart_item_id, quantity }) => {
+    const item = await cartRepository.getCartItemById(cart_item_id);
+
+    if (!item || item.user_id !== user_id) {
+        return { status: 'failed', message: 'Item não encontrado no carrinho.' };
+    }
+
+    if (quantity <= 0) {
+        await cartRepository.removeItem(cart_item_id);
+        return { status: 'removed', message: 'Item removido do carrinho.' };
+    }
+
+    const updated = await cartRepository.updateQuantity(cart_item_id, quantity);
+    return { status: 'updated', item: updated };
+};
+
+const removeItem = async ({ user_id, cart_item_id }) => {
+    const item = await cartRepository.getCartItemById(cart_item_id);
+
+    if (!item || item.user_id !== user_id) {
+        return { status: 'failed', message: 'Item não encontrado no carrinho.' };
+    }
+
+    await cartRepository.removeItem(cart_item_id);
+    return { status: 'removed', message: 'Item removido do carrinho.' };
+};
+
+const clearCart = async (user_id) => {
+    await cartRepository.clearCart(user_id);
+    return { status: 'cleared', message: 'Carrinho esvaziado com sucesso.' };
+};
+
+module.exports = { getCartItems, addCartItem, updateQuantity, removeItem, clearCart };

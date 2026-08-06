@@ -48,4 +48,44 @@ const hasInCart = async ({ user_id, product_id }) => {
     return result.rows;
 }
 
-module.exports = { getCartItems, addCartItem, hasInCart };
+const getCartItemById = async (id) => {
+    const result = await pool.query(`
+        SELECT id, user_id, product_id, name, price, color, size, quantity
+        FROM cart
+        WHERE id = $1;
+    `, [id]);
+
+    return result.rows[0];
+};
+
+const updateQuantity = async (id, quantity) => {
+    const result = await pool.query(`
+        UPDATE cart
+        SET quantity = $1
+        WHERE id = $2
+        RETURNING *;
+    `, [quantity, id]);
+
+    return result.rows[0];
+};
+
+const removeItem = async (id) => {
+    const result = await pool.query(`
+        DELETE FROM cart
+        WHERE id = $1
+        RETURNING *;
+    `, [id]);
+
+    return result.rows[0];
+};
+
+const clearCart = async (user_id) => {
+    const result = await pool.query(`
+        DELETE FROM cart
+        WHERE user_id = $1;
+    `, [user_id]);
+
+    return result.rowCount;
+};
+
+module.exports = { getCartItems, addCartItem, hasInCart, getCartItemById, updateQuantity, removeItem, clearCart };
