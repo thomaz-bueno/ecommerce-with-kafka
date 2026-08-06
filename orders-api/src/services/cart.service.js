@@ -8,8 +8,10 @@ const getCartItems = async (id) => {
         items.map(async (item) => {
             const imageKey = `imagens/${item.product_id}/${item.color}.png`;
             const image_url = await s3Service.getSignedUrlByKey(imageKey);
+            const sizes = await cartRepository.getSizesByProduct(item.product_id, item.color);
+            const availableSizes = sizes.map(s => s.size);
 
-            return { ...item, image_url };
+            return { ...item, image_url, availableSizes };
         })
     );
 
@@ -44,6 +46,17 @@ const updateQuantity = async ({ user_id, cart_item_id, quantity }) => {
     return { status: 'updated', item: updated };
 };
 
+const updateSize = async ({ user_id, cart_item_id, size }) => {
+    const item = await cartRepository.getCartItemById(cart_item_id);
+
+    if (!item || item.user_id !== user_id) {
+        return { status: 'failed', message: 'Item não encontrado no carrinho.' };
+    }
+
+    const updated = await cartRepository.updateSize(cart_item_id, size);
+    return { status: 'updated', item: updated };
+};
+
 const removeItem = async ({ user_id, cart_item_id }) => {
     const item = await cartRepository.getCartItemById(cart_item_id);
 
@@ -60,4 +73,4 @@ const clearCart = async (user_id) => {
     return { status: 'cleared', message: 'Carrinho esvaziado com sucesso.' };
 };
 
-module.exports = { getCartItems, addCartItem, updateQuantity, removeItem, clearCart };
+module.exports = { getCartItems, addCartItem, updateQuantity, updateSize, removeItem, clearCart };
