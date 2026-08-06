@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './cart-item.css'
 
 interface CartItemProps {
+  id: number
   product_id: number
   image_url: string
   name: string
@@ -10,17 +11,75 @@ interface CartItemProps {
   quantity: number
   price: string
   is_liked: boolean
+  availableSizes: string[]
+  onRemove: () => void
+  onQuantityChange: (cartItemId: number, newQuantity: number) => void
+  onSizeChange: (cartItemId: number, newSize: string) => void
+  onItemRemoved: (cartItemId: number) => void
 }
 
-function CartItem({ product_id, image_url, name, color, size, quantity, price, is_liked }: CartItemProps) {
+function CartItem({
+  id,
+  product_id,
+  image_url,
+  name,
+  color,
+  size,
+  quantity,
+  price,
+  is_liked,
+  availableSizes,
+  onRemove,
+  onQuantityChange,
+  onSizeChange,
+  onItemRemoved,
+}: CartItemProps) {
   const totalPrice = (parseFloat(price) * quantity).toFixed(2)
   const capitalizedColor = color.charAt(0).toUpperCase() + color.slice(1)
   const [isLiked, setIsLiked] = useState(is_liked)
   const isToggling = useRef(false)
 
+  const [isQuantityOpen, setIsQuantityOpen] = useState(false)
+  const [currentQuantity, setCurrentQuantity] = useState(quantity)
+  const quantityRef = useRef<HTMLDivElement>(null)
+  const pendingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const [isSizeOpen, setIsSizeOpen] = useState(false)
+  const [currentSize, setCurrentSize] = useState(size)
+  const sizeRef = useRef<HTMLDivElement>(null)
+  const pendingSizeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    setCurrentQuantity(quantity)
+  }, [quantity])
+
+  useEffect(() => {
+    setCurrentSize(size)
+  }, [size])
+
   useEffect(() => {
     setIsLiked(is_liked)
   }, [is_liked])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (quantityRef.current && !quantityRef.current.contains(e.target as Node)) {
+        setIsQuantityOpen(false)
+      }
+      if (sizeRef.current && !sizeRef.current.contains(e.target as Node)) {
+        setIsSizeOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (pendingTimeout.current) clearTimeout(pendingTimeout.current)
+      if (pendingSizeTimeout.current) clearTimeout(pendingSizeTimeout.current)
+    }
+  }, [])
 
   function toggleFavorite() {
     if (isToggling.current) return
@@ -46,6 +105,73 @@ function CartItem({ product_id, image_url, name, color, size, quantity, price, i
       })
   }
 
+  function handleSelectQuantity(newQuantity: number) {
+    if (newQuantity === currentQuantity) {
+      setIsQuantityOpen(false)
+      return
+    }
+
+    setCurrentQuantity(newQuantity)
+    setIsQuantityOpen(false)
+    onQuantityChange(id, newQuantity)
+
+    if (pendingTimeout.current) clearTimeout(pendingTimeout.current)
+
+    pendingTimeout.current = setTimeout(() => {
+      fetch('http://localhost:3000/cart/update-quantity', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ cart_item_id: id, quantity: newQuantity }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === 'removed') {
+            onItemRemoved(id)
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          setCurrentQuantity(quantity)
+          onQuantityChange(id, quantity)
+        })
+    }, 500)
+  }
+
+  function handleSelectSize(newSize: string) {
+    if (newSize === currentSize) {
+      setIsSizeOpen(false)
+      return
+    }
+
+    setCurrentSize(newSize)
+    setIsSizeOpen(false)
+    onSizeChange(id, newSize)
+
+    if (pendingSizeTimeout.current) clearTimeout(pendingSizeTimeout.current)
+
+    pendingSizeTimeout.current = setTimeout(() => {
+      fetch('http://localhost:3000/cart/update-size', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ cart_item_id: id, size: newSize }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === 'failed') {
+            setCurrentSize(size)
+            onSizeChange(id, size)
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          setCurrentSize(size)
+          onSizeChange(id, size)
+        })
+    }, 500)
+  }
+
   return (
     <>
       <div className="cart-item">
@@ -59,18 +185,54 @@ function CartItem({ product_id, image_url, name, color, size, quantity, price, i
               <h3 className="item-name">{name}</h3>
               <p className="item-color">{capitalizedColor}</p>
               <div className="item-meta">
-                <button className="meta-btn">
-                  Size {size}
-                  <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-                <button className="meta-btn">
-                  Quantity {quantity}
-                  <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
+                <div className="size-dropdown-wrapper" ref={sizeRef}>
+                  <button
+                    className="meta-btn"
+                    onClick={() => setIsSizeOpen((prev) => !prev)}
+                  >
+                    Size {currentSize}
+                    <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  {isSizeOpen && (
+                    <div className="size-dropdown">
+                      {availableSizes.map((s) => (
+                        <button
+                          key={s}
+                          className={`size-option ${s === currentSize ? 'active' : ''}`}
+                          onClick={() => handleSelectSize(s)}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="quantity-dropdown-wrapper" ref={quantityRef}>
+                  <button
+                    className="meta-btn"
+                    onClick={() => setIsQuantityOpen((prev) => !prev)}
+                  >
+                    Quantity {currentQuantity}
+                    <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  {isQuantityOpen && (
+                    <div className="quantity-dropdown">
+                      {[1, 2, 3, 4, 5].map((num) => (
+                        <button
+                          key={num}
+                          className={`quantity-option ${num === currentQuantity ? 'active' : ''}`}
+                          onClick={() => handleSelectQuantity(num)}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <span className="item-price">R$ {totalPrice}</span>
@@ -82,7 +244,7 @@ function CartItem({ product_id, image_url, name, color, size, quantity, price, i
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </button>
-            <button className="action-icon" aria-label="Remove item">
+            <button className="action-icon" aria-label="Remove item" onClick={onRemove}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />

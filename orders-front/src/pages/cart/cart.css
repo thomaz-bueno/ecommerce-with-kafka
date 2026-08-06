@@ -18,16 +18,6 @@
   padding-top: 0;
 }
 
-/* Free Delivery Banner */
-.free-delivery-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #f5f5f5;
-  padding: 14px 20px;
-  margin-bottom: 28px;
-}
-
 .banner-content {
   display: flex;
   flex-direction: column;
@@ -73,12 +63,30 @@
 }
 
 /* Bag Title */
+.bag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .bag-title {
   font-size: 22px;
   font-weight: 600;
   color: #111;
-  margin-bottom: 24px;
+  margin: 0;
   line-height: 1;
+}
+
+.clear-cart-link {
+  font-size: 13px;
+  color: #707070;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.clear-cart-link:hover {
+  color: #111;
 }
 
 /* Cart Item */

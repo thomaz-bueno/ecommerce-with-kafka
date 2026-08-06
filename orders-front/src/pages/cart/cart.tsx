@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import CartItem from '../../components/cart-item/cart-item'
+import RemoveConfirmationModal from '../../components/modal-remove-confirmation/remove-confirmation-modal'
 import './cart.css'
 
 interface CartItemData {
@@ -12,11 +13,15 @@ interface CartItemData {
   quantity: number
   is_liked: boolean
   image_url: string
+  availableSizes: string[]
 }
 
 function Cart() {
   const [bannerVisible, setBannerVisible] = useState(true)
   const [items, setItems] = useState<CartItemData[]>([])
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
+  const [itemToRemove, setItemToRemove] = useState<CartItemData | null>(null)
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false)
 
   useEffect(() => {
     const userId = localStorage.getItem('userId')
@@ -29,6 +34,72 @@ function Cart() {
       .catch((err) => console.error(err))
   }, [])
 
+  function handleOpenRemoveModal(item: CartItemData) {
+    setItemToRemove(item)
+    setIsRemoveModalOpen(true)
+  }
+
+  function handleCloseRemoveModal() {
+    setIsRemoveModalOpen(false)
+    setItemToRemove(null)
+  }
+
+  function handleConfirmRemove() {
+    if (!itemToRemove) return
+
+    fetch(`http://localhost:3000/cart/remove/${itemToRemove.id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === 'removed') {
+          setItems((prev) => prev.filter((item) => item.id !== itemToRemove.id))
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        handleCloseRemoveModal()
+      })
+  }
+
+  function handleQuantityChange(cartItemId: number, newQuantity: number) {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+      )
+    )
+  }
+
+  function handleItemRemoved(cartItemId: number) {
+    setItems((prev) => prev.filter((item) => item.id !== cartItemId))
+  }
+
+  function handleSizeChange(cartItemId: number, newSize: string) {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === cartItemId ? { ...item, size: newSize } : item
+      )
+    )
+  }
+
+  function handleConfirmClear() {
+    fetch('http://localhost:3000/cart/clear', {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === 'cleared') {
+          setItems([])
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        setIsClearModalOpen(false)
+      })
+  }
+
   const subtotal = items.reduce((acc, item) => acc + parseFloat(item.price) * item.quantity, 0)
   const shipping = items.length > 0 ? 250 : 0
   const total = subtotal + shipping
@@ -38,11 +109,19 @@ function Cart() {
       <div className="cart-container">
         <div className="cart-left">
 
-          <h1 className="bag-title">Carrinho</h1>
+          <div className="bag-header">
+            <h1 className="bag-title">Carrinho</h1>
+            {items.length > 0 && (
+              <a className="clear-cart-link" onClick={() => setIsClearModalOpen(true)}>
+                Limpar carrinho
+              </a>
+            )}
+          </div>
 
           {items.map((item) => (
             <CartItem
               key={item.id}
+              id={item.id}
               product_id={item.product_id}
               image_url={item.image_url}
               name={item.name}
@@ -51,6 +130,11 @@ function Cart() {
               quantity={item.quantity}
               price={item.price}
               is_liked={item.is_liked}
+              availableSizes={item.availableSizes}
+              onRemove={() => handleOpenRemoveModal(item)}
+              onQuantityChange={handleQuantityChange}
+              onSizeChange={handleSizeChange}
+              onItemRemoved={handleItemRemoved}
             />
           ))}
         </div>
@@ -90,6 +174,24 @@ function Cart() {
           </div>
         </div>
       </div>
+
+      <RemoveConfirmationModal
+        isOpen={isRemoveModalOpen}
+        title="Remover item"
+        message={`Tem certeza que deseja remover ${itemToRemove?.name ?? ''} do carrinho?`}
+        confirmLabel="Remover"
+        onClose={handleCloseRemoveModal}
+        onConfirm={handleConfirmRemove}
+      />
+
+      <RemoveConfirmationModal
+        isOpen={isClearModalOpen}
+        title="Limpar carrinho"
+        message="Tem certeza que deseja remover todos os itens do carrinho?"
+        confirmLabel="Limpar"
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={handleConfirmClear}
+      />
     </div>
   )
 }
