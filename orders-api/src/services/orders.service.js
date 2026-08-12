@@ -48,6 +48,13 @@ const validateOrder = (body = {}) => {
       };
     }
 
+    if (!item?.color || !item?.size) {
+      return {
+        valid: false,
+        message: "Todos os items devem ter size e color.",
+      };
+    }
+
     if (!isPositiveNumber(item.quantity)) {
       return {
         valid: false,
@@ -70,6 +77,10 @@ const validateOrder = (body = {}) => {
     total,
   };
 };
+
+const validateItems = () => {
+  
+}
 
 const createResponse = ({ valid, message, total = null }) => {
   if (!valid) {
