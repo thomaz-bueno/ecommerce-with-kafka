@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import ProductCard from '../../components/product/product-card'
 import './favorites.css'
+import { Link } from 'react-router-dom'
 
 interface FavoriteProduct {
   id: number
@@ -15,8 +16,6 @@ function Favorites() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId')
-
     fetch(`http://localhost:3000/favorites/`, {
       credentials: 'include',
     })
