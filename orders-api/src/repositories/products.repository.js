@@ -27,7 +27,11 @@ const listOneProduct = async (id, user_id) => {
             EXISTS(
                 SELECT 1 FROM favorites 
                 WHERE user_id = $1::UUID AND product_id = p.id
-            ) AS is_liked
+            ) AS is_liked,
+            EXISTS(
+                SELECT 1 FROM cart
+                WHERE user_id = $1::UUID AND product_id = p.id
+            ) AS in_cart
         FROM products p
         WHERE p.id = $2;`
         

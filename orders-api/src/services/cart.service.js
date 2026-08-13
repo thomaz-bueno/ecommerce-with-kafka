@@ -58,13 +58,13 @@ const updateSize = async ({ user_id, cart_item_id, size }) => {
 };
 
 const removeItem = async ({ user_id, cart_item_id }) => {
-    const item = await cartRepository.getCartItemById(cart_item_id);
+    const item = await cartRepository.getCartItemById( user_id, cart_item_id );
 
     if (!item || item.user_id !== user_id) {
         return { status: 'failed', message: 'Item não encontrado no carrinho.' };
     }
 
-    await cartRepository.removeItem(cart_item_id);
+    await cartRepository.removeItem(user_id, cart_item_id);
     return { status: 'removed', message: 'Item removido do carrinho.' };
 };
 

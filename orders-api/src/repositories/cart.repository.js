@@ -48,13 +48,15 @@ const hasInCart = async ({ user_id, product_id }) => {
     return result.rows;
 }
 
-const getCartItemById = async (id) => {
+const getCartItemById = async ( user_id, product_id ) => {
+    console.log(product_id);
+
     const result = await pool.query(`
         SELECT id, user_id, product_id, name, price, color, size, quantity
         FROM cart
-        WHERE id = $1;
-    `, [id]);
-
+        WHERE user_id = $1::UUID AND product_id = $2;
+    `, [user_id, product_id]);
+    
     return result.rows[0];
 };
 
@@ -80,12 +82,12 @@ const updateSize = async (id, size) => {
     return result.rows[0];
 };
 
-const removeItem = async (id) => {
+const removeItem = async (user_id, product_id) => {
     const result = await pool.query(`
         DELETE FROM cart
-        WHERE id = $1
+        WHERE user_id = $1 AND product_id = $2
         RETURNING *;
-    `, [id]);
+    `, [user_id, product_id]);
 
     return result.rows[0];
 };
