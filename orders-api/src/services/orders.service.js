@@ -6,10 +6,14 @@ const createOrder = async (body) => {
   const validationResult = validateOrder(body);
 
   if (validationResult.valid) {
+    const productsWithPrices = await ordersRepository.getPricesByVariants(body.items);
+    
+    const total = calculateTotalPrice(productsWithPrices);
+
     const savedOrder = await ordersRepository.saveOrder({
       uuid: createUUID(),
-      items: body.items,
-      total: validationResult.total,
+      items: productsWithPrices,
+      total,
     });
 
     await produceOrderCreated(savedOrder);
@@ -39,7 +43,6 @@ const validateOrder = (body = {}) => {
     };
   }
 
-  let total = 0;
   for (const item of items) {
     if (!item?.productId) {
       return {
@@ -61,45 +64,35 @@ const validateOrder = (body = {}) => {
         message: "Quantidade inválida",
       };
     }
-
-    if (!isPositiveNumber(item.price)) {
-      return {
-        valid: false,
-        message: "Preço inválido",
-      };
-    }
-
-    total += item.quantity * item.price;
   }
 
   return {
     valid: true,
-    total,
   };
 };
 
-const validateItems = () => {
-  
-}
-
-const createResponse = ({ valid, message, total = null }) => {
+const createResponse = ({ valid, message }) => {
   if (!valid) {
     return {
       status: "failed",
       message,
-      total,
     };
   }
 
   return {
     status: "created",
     message: "Pedido criado com sucesso!",
-    total,
   };
 };
 
 const isPositiveNumber = (value) =>
   typeof value === "number" && Number.isFinite(value) && value > 0;
+
+
+const calculateTotalPrice = (items) => {
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  return Number(total.toFixed(2));
+}
 
 module.exports = {
   createOrder,
