@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CartItem from '../../components/cart-item/cart-item'
 import RemoveConfirmationModal from '../../components/modal-remove-confirmation/remove-confirmation-modal'
 import './cart.css'
@@ -17,6 +18,7 @@ interface CartItemData {
 }
 
 function Cart() {
+  const navigate = useNavigate()
   const [bannerVisible, setBannerVisible] = useState(true)
   const [items, setItems] = useState<CartItemData[]>([])
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
@@ -108,35 +110,51 @@ function Cart() {
     <div className="cart-page">
       <div className="cart-container">
         <div className="cart-left">
+          {items.length === 0 ? (
+            <div className="empty-cart">
+              <div className="empty-cart-icon-wrapper">
+                <svg className="empty-cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+              </div>
+              <h2 className="empty-cart-title">Seu carrinho está vazio</h2>
+              <p className="empty-cart-subtitle">Adicione itens ao carrinho para continuar</p>
+              <button className="empty-cart-btn" onClick={() => navigate('/')}>
+                Fazer compras
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="bag-header">
+                <h1 className="bag-title">Carrinho</h1>
+                <a className="clear-cart-link" onClick={() => setIsClearModalOpen(true)}>
+                  Limpar carrinho
+                </a>
+              </div>
 
-          <div className="bag-header">
-            <h1 className="bag-title">Carrinho</h1>
-            {items.length > 0 && (
-              <a className="clear-cart-link" onClick={() => setIsClearModalOpen(true)}>
-                Limpar carrinho
-              </a>
-            )}
-          </div>
-
-          {items.map((item) => (
-            <CartItem
-              key={item.id}
-              id={item.id}
-              product_id={item.product_id}
-              image_url={item.image_url}
-              name={item.name}
-              color={item.color}
-              size={item.size}
-              quantity={item.quantity}
-              price={item.price}
-              is_liked={item.is_liked}
-              availableSizes={item.availableSizes}
-              onRemove={() => handleOpenRemoveModal(item)}
-              onQuantityChange={handleQuantityChange}
-              onSizeChange={handleSizeChange}
-              onItemRemoved={handleItemRemoved}
-            />
-          ))}
+              {items.map((item) => (
+                <CartItem
+                  key={item.id}
+                  id={item.id}
+                  product_id={item.product_id}
+                  image_url={item.image_url}
+                  name={item.name}
+                  color={item.color}
+                  size={item.size}
+                  quantity={item.quantity}
+                  price={item.price}
+                  is_liked={item.is_liked}
+                  availableSizes={item.availableSizes}
+                  onRemove={() => handleOpenRemoveModal(item)}
+                  onQuantityChange={handleQuantityChange}
+                  onSizeChange={handleSizeChange}
+                  onItemRemoved={handleItemRemoved}
+                />
+              ))}
+            </>
+          )}
         </div>
 
         <div className="cart-right">
@@ -145,13 +163,6 @@ function Cart() {
           <div className="summary-row">
             <div className="summary-label">
               Subtotal
-              <span className="info-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="16" x2="12" y2="12" />
-                  <line x1="12" y1="8" x2="12.01" y2="8" />
-                </svg>
-              </span>
             </div>
             <span className="summary-value">R$ {subtotal.toFixed(2)}</span>
           </div>

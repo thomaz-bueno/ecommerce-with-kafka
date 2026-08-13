@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './cart-item.css'
 
 interface CartItemProps {
@@ -34,6 +35,7 @@ function CartItem({
   onSizeChange,
   onItemRemoved,
 }: CartItemProps) {
+  const navigate = useNavigate()
   const totalPrice = (parseFloat(price) * quantity).toFixed(2)
   const capitalizedColor = color.charAt(0).toUpperCase() + color.slice(1)
   const [isLiked, setIsLiked] = useState(is_liked)
@@ -174,7 +176,7 @@ function CartItem({
 
   return (
     <>
-      <div className="cart-item">
+      <div className="cart-item" onClick={() => navigate(`/product/${product_id}`)}>
         <div className="item-image">
           <img src={image_url} alt={name} />
         </div>
@@ -188,9 +190,9 @@ function CartItem({
                 <div className="size-dropdown-wrapper" ref={sizeRef}>
                   <button
                     className="meta-btn"
-                    onClick={() => setIsSizeOpen((prev) => !prev)}
+                    onClick={(e) => { e.stopPropagation(); setIsSizeOpen((prev) => !prev) }}
                   >
-                    Size {currentSize}
+                    Tamanho {currentSize}
                     <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
@@ -201,7 +203,7 @@ function CartItem({
                         <button
                           key={s}
                           className={`size-option ${s === currentSize ? 'active' : ''}`}
-                          onClick={() => handleSelectSize(s)}
+                          onClick={(e) => { e.stopPropagation(); handleSelectSize(s) }}
                         >
                           {s}
                         </button>
@@ -212,9 +214,9 @@ function CartItem({
                 <div className="quantity-dropdown-wrapper" ref={quantityRef}>
                   <button
                     className="meta-btn"
-                    onClick={() => setIsQuantityOpen((prev) => !prev)}
+                    onClick={(e) => { e.stopPropagation(); setIsQuantityOpen((prev) => !prev) }}
                   >
-                    Quantity {currentQuantity}
+                    Quantidade {currentQuantity}
                     <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
@@ -225,7 +227,7 @@ function CartItem({
                         <button
                           key={num}
                           className={`quantity-option ${num === currentQuantity ? 'active' : ''}`}
-                          onClick={() => handleSelectQuantity(num)}
+                          onClick={(e) => { e.stopPropagation(); handleSelectQuantity(num) }}
                         >
                           {num}
                         </button>
@@ -239,12 +241,12 @@ function CartItem({
           </div>
 
           <div className="item-actions">
-            <button className="action-icon" aria-label="Add to favorites" onClick={toggleFavorite}>
+            <button className="action-icon" aria-label="Add to favorites" onClick={(e) => { e.stopPropagation(); toggleFavorite() }}>
               <svg viewBox="0 0 24 24" fill={isLiked ? '#e53e3e' : 'none'} stroke="currentColor" strokeWidth="1.5">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </button>
-            <button className="action-icon" aria-label="Remove item" onClick={onRemove}>
+            <button className="action-icon" aria-label="Remove item" onClick={(e) => { e.stopPropagation(); onRemove() }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
