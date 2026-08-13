@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
 import Header from './components/header/header'
+import Footer from './components/footer/footer'
 import Home from './pages/home/home'
 import Product from './pages/product/product'
 import Login from './pages/login/login'
@@ -28,6 +29,7 @@ function AppRoutes() {
           <Route path="/cart" element={<Cart />} />
         </Route>
       </Routes>
+      {!hideHeader && <Footer />}
     </>
   )
 }
