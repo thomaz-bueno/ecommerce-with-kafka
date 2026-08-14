@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "debug": "nodemon --inspect src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "consumers": "node src/scripts/consumers.js"
   },
   "keywords": [],
   "author": "",

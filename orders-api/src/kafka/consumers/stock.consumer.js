@@ -15,13 +15,9 @@ const consumeStock = async () => {
             console.log(`[stock] Processando o pedido ${order.orderId}`);
 
             try {
-                for (const item of order.items) {
-                    await stockRepository.deductStock(item.productId, item.quantity);
-                    console.log(`[stock] Deduzido ${item.quantity}x ${item.productId}`);
-                }
-
+                await stockRepository.deductStockForOrder(order.items);
                 console.log(`[stock] Pedido ${order.orderId} processado com sucesso`);
-            }catch (err) {
+            } catch (err) {
                 console.error(`[stock] Erro ao processar o pedido ${order.orderId}: `, err.message);
                 throw err;
             }

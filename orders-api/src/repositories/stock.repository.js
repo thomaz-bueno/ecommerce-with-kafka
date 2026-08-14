@@ -1,36 +1,50 @@
 const pool = require('../database/postgres.js');
 
-const getStock = async (productId) => {
-    const result = await pool.query(
-        'SELECT quantity FROM stock WHERE product_id = $1',
-        [productId]
-    );
-    return result.rows[0];
-}
-
-const deductStock = async (productId, quantity) => {
-    const result = await pool.query(
-        `UPDATE stock
-         SET quantity = GREATEST(quantity - $1, 0),
-             updated_at = NOW()
+const deductStock = async (productId, color, size, quantity, client = pool) => {
+    const result = await client.query(
+        `UPDATE product_variants
+         SET stock = GREATEST(stock - $1, 0)
          WHERE product_id = $2
-         RETURNING product_id, quantity`,
-         [quantity, productId]
+           AND color = $3
+           AND size = $4
+           AND stock >= $1
+         RETURNING id, product_id, color, size, stock`,
+        [quantity, productId, color, size]
     );
-    return result.rows[0];
-}
 
-const upsertStock = async (productId, quantity) => {
-    const result = await pool.query(
-        `INSERT INTO stock (product_id, quantity)
-         VALUES ($1, $2)
-         ON CONFLICT (product_id) DO UPDATE
-         SET quantity = stock.quantity + $2,
-             updated_at = NOW()
-         RETURNING product_id, quantity`,
-         [productId, quantity]
-    );
-    return result.rows[0];
-}
+    return result.rowCount;
+};
 
-module.exports = { getStock, deductStock, upsertStock };
+const deductStockForOrder = async (items) => {
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        for (const item of items) {
+            const rowCount = await deductStock(
+                item.productId,
+                item.color,
+                item.size,
+                item.quantity,
+                client
+            );
+
+            if (rowCount === 0) {
+                throw new Error(
+                    `Estoque insuficiente ou variante inexistente: produto ${item.productId}, cor ${item.color}, tamanho ${item.size}`
+                );
+            }
+        }
+
+        await client.query('COMMIT');
+        return { success: true };
+    } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+    } finally {
+        client.release();
+    }
+};
+
+module.exports = { deductStock, deductStockForOrder };
