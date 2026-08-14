@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CartItem from '../../components/cart-item/cart-item'
 import RemoveConfirmationModal from '../../components/modal-remove-confirmation/remove-confirmation-modal'
+import OrderSuccessModal from '../../components/order-success-modal/order-success-modal'
+import OrderErrorModal from '../../components/order-error-modal/order-error-modal'
 import './cart.css'
 
 interface CartItemData {
@@ -24,11 +26,14 @@ function Cart() {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
   const [itemToRemove, setItemToRemove] = useState<CartItemData | null>(null)
   const [isClearModalOpen, setIsClearModalOpen] = useState(false)
+  const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false)
 
   useEffect(() => {
     const userId = localStorage.getItem('userId')
 
-    fetch('http://localhost:3000/cart', {
+    fetch(`${import.meta.env.VITE_API_URL}/cart`, {
       credentials: 'include',
     })
       .then((res) => res.json())
@@ -49,7 +54,7 @@ function Cart() {
   function handleConfirmRemove() {
     if (!itemToRemove) return
 
-    fetch(`http://localhost:3000/cart/remove/${itemToRemove.id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/remove/${itemToRemove.id}`, {
       method: 'DELETE',
       credentials: 'include',
     })
@@ -86,7 +91,7 @@ function Cart() {
   }
 
   function handleConfirmClear() {
-    fetch('http://localhost:3000/cart/clear', {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/clear`, {
       method: 'DELETE',
       credentials: 'include',
     })
@@ -100,6 +105,41 @@ function Cart() {
       .finally(() => {
         setIsClearModalOpen(false)
       })
+  }
+
+  async function handleCheckout() {
+    if (isCheckingOut || items.length === 0) return
+
+    setIsCheckingOut(true)
+
+    try {
+      const payload = {
+        items: items.map((item) => ({
+          productId: String(item.product_id),
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+        })),
+      }
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        setIsErrorModalOpen(true)
+        return
+      }
+
+      setIsSuccessModalOpen(true)
+    } catch {
+      setIsErrorModalOpen(true)
+    } finally {
+      setIsCheckingOut(false)
+    }
   }
 
   const subtotal = items.reduce((acc, item) => acc + parseFloat(item.price) * item.quantity, 0)
@@ -180,7 +220,22 @@ function Cart() {
           </div>
 
           <div className="checkout-buttons">
-            <button className="checkout-btn guest-btn">Finalizar pedido</button>
+            <button
+              className={`checkout-btn guest-btn ${isCheckingOut ? 'checkout-btn-loading' : ''}`}
+              disabled={isCheckingOut || items.length === 0}
+              onClick={handleCheckout}
+            >
+              {isCheckingOut ? (
+                <>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                  </svg>
+                  Finalizando...
+                </>
+              ) : (
+                'Finalizar pedido'
+              )}
+            </button>
             <button className="checkout-btn member-btn">Continuar comprando</button>
           </div>
         </div>
@@ -202,6 +257,20 @@ function Cart() {
         confirmLabel="Limpar"
         onClose={() => setIsClearModalOpen(false)}
         onConfirm={handleConfirmClear}
+      />
+
+      <OrderSuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={() => {
+          setIsSuccessModalOpen(false)
+          setItems([])
+        }}
+      />
+
+      <OrderErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        onRetry={handleCheckout}
       />
     </div>
   )

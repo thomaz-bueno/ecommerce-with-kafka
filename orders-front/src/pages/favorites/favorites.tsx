@@ -5,6 +5,7 @@ import './favorites.css'
 
 interface FavoriteProduct {
   id: number
+  product_id: number
   name: string
   base_price: string
   image_url: string
@@ -17,7 +18,7 @@ function Favorites() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch(`http://localhost:3000/favorites/`, {
+    fetch(`${import.meta.env.VITE_API_URL}/favorites/`, {
       credentials: 'include',
     })
       .then((res) => {
@@ -53,7 +54,7 @@ function Favorites() {
           </div>
         )}
         {products.map((product) => (
-          <ProductCard key={product.id} {...product} />
+          <ProductCard key={product.id} id={product.product_id} name={product.name} base_price={product.base_price} image_url={product.image_url} />
         ))}
       </div>
     </section>

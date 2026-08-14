@@ -29,7 +29,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     function fetchCart() {
 
-        fetch('http://localhost:3000/cart', {
+        fetch(`${import.meta.env.VITE_API_URL}/cart`, {
             credentials: 'include',
         })
             .then((res) => res.json())

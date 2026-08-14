@@ -51,7 +51,7 @@ function Product() {
   const isToggling = useRef(false)
 
   useEffect(() => {
-    fetch(`http://localhost:3000/products/${id}?color=${color}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/products/${id}?color=${color}`, {
       credentials: 'include',
     })
       .then((res) => {
@@ -87,7 +87,7 @@ function Product() {
   function addToCart() {
     const price = parseFloat(product!.base_price)
 
-    fetch('http://localhost:3000/cart/add', {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -116,7 +116,7 @@ function Product() {
     setInCart(false)
     setIsRemoveModalOpen(false)
 
-    fetch(`http://localhost:3000/cart/remove/${product!.id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/remove/${product!.id}`, {
       method: 'DELETE',
       credentials: 'include',
     })
@@ -139,7 +139,7 @@ function Product() {
 
     setIsLiked((prev) => !prev)
 
-    fetch('http://localhost:3000/favorites/toggle', {
+    fetch(`${import.meta.env.VITE_API_URL}/favorites/toggle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

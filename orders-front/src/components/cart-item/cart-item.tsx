@@ -89,7 +89,7 @@ function CartItem({
 
     setIsLiked((prev) => !prev)
 
-    fetch('http://localhost:3000/favorites/toggle', {
+    fetch(`${import.meta.env.VITE_API_URL}/favorites/toggle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -120,7 +120,7 @@ function CartItem({
     if (pendingTimeout.current) clearTimeout(pendingTimeout.current)
 
     pendingTimeout.current = setTimeout(() => {
-      fetch('http://localhost:3000/cart/update-quantity', {
+      fetch(`${import.meta.env.VITE_API_URL}/cart/update-quantity`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -153,7 +153,7 @@ function CartItem({
     if (pendingSizeTimeout.current) clearTimeout(pendingSizeTimeout.current)
 
     pendingSizeTimeout.current = setTimeout(() => {
-      fetch('http://localhost:3000/cart/update-size', {
+      fetch(`${import.meta.env.VITE_API_URL}/cart/update-size`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -1,0 +1,87 @@
+.os-modal {
+  border: none;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 440px;
+  width: calc(100% - 48px);
+  background: transparent;
+  box-shadow: none;
+  margin: auto;
+}
+
+.os-modal::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.os-modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.os-icon-wrapper {
+  margin-bottom: 20px;
+}
+
+.os-icon {
+  width: 48px;
+  height: 48px;
+  color: #111;
+}
+
+.os-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.os-message {
+  font-size: 14px;
+  color: #707070;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.os-divider {
+  height: 1px;
+  background-color: #e5e5e5;
+  margin: 24px 0;
+  width: 100%;
+}
+
+.os-actions {
+  width: 100%;
+}
+
+.os-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.os-btn-primary {
+  background-color: #111;
+  color: #fff;
+  border: none;
+}
+
+.os-btn-primary:hover {
+  background-color: #333;
+}
+
+@media (max-width: 480px) {
+  .os-modal-content {
+    padding: 24px;
+  }
+}

@@ -7,7 +7,7 @@ export function useProducts() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('http://localhost:3000/products')
+    fetch(`${import.meta.env.VITE_API_URL}/products`)
       .then((res) => {
         if (!res.ok) throw new Error('Erro ao buscar produtos')
         return res.json()

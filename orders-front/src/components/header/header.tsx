@@ -23,7 +23,7 @@ function Header() {
   }, [])
 
   function handleLogout() {
-    fetch('http://localhost:3000/auth/logout', {
+    fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
     }).finally(() => {
