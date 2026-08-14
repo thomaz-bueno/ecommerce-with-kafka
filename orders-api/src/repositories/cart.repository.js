@@ -49,8 +49,6 @@ const hasInCart = async ({ user_id, product_id }) => {
 }
 
 const getCartItemById = async ( user_id, product_id ) => {
-    console.log(product_id);
-
     const result = await pool.query(`
         SELECT id, user_id, product_id, name, price, color, size, quantity
         FROM cart

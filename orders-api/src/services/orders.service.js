@@ -1,8 +1,9 @@
-const ordersRepository = require('../repositories/orders.repository');
+const ordersRepository = require('../repositories/orders.repository.js');
+const cartRepository = require('../repositories/cart.repository.js');
 const { produceOrderCreated } = require('../kafka/producer')
 const crypto = require('crypto');
 
-const createOrder = async (body) => {
+const createOrder = async (body, user_id) => {
   const validationResult = validateOrder(body);
 
   if (validationResult.valid) {
@@ -15,6 +16,8 @@ const createOrder = async (body) => {
       items: productsWithPrices,
       total,
     });
+
+    await cartRepository.clearCart(user_id);
 
     await produceOrderCreated(savedOrder);
   }
