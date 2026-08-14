@@ -4,6 +4,7 @@ import CartItem from '../../components/cart-item/cart-item'
 import RemoveConfirmationModal from '../../components/modal-remove-confirmation/remove-confirmation-modal'
 import OrderSuccessModal from '../../components/order-success-modal/order-success-modal'
 import OrderErrorModal from '../../components/order-error-modal/order-error-modal'
+import { useCart } from '../../contexts/CartContext'
 import './cart.css'
 
 interface CartItemData {
@@ -21,6 +22,7 @@ interface CartItemData {
 
 function Cart() {
   const navigate = useNavigate()
+  const { fetchCart } = useCart()
   const [bannerVisible, setBannerVisible] = useState(true)
   const [items, setItems] = useState<CartItemData[]>([])
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
@@ -135,6 +137,7 @@ function Cart() {
       }
 
       setIsSuccessModalOpen(true)
+      fetchCart()
     } catch {
       setIsErrorModalOpen(true)
     } finally {
