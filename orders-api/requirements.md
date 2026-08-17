@@ -1,3 +1,4 @@
 ## TASKs ##
 
-- Diminuir estoque de products_variants em stock.consumer
+- Fazer rota GET orders
+- Tratativa para caso não houver estoque, mudar o status do pedido de 'success' para 'failed'.

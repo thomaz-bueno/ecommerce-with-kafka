@@ -11,6 +11,18 @@ const createOrder = async (req, res) => {
     }
 }
 
+const listOrders = async (req, res) => {
+    try {
+        const userId = req.user.id
+        const result = await ordersService.listOrders(userId);
+
+        return res.status(200).json(result);
+    } catch (err) {
+        return res.status(500).json({ erro: err.message });
+    }
+}
+
 module.exports = {
-    createOrder
+    createOrder,
+    listOrders
 };

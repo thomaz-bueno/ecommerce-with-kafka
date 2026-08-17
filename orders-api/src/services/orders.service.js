@@ -15,6 +15,7 @@ const createOrder = async (body, user_id) => {
       uuid: createUUID(),
       items: productsWithPrices,
       total,
+      user_id
     });
 
     await cartRepository.clearCart(user_id);
@@ -97,6 +98,13 @@ const calculateTotalPrice = (items) => {
   return Number(total.toFixed(2));
 }
 
+const listOrders = async (userId) => {
+  const orders = await ordersRepository.listOrders(userId);
+
+  return orders;
+}
+
 module.exports = {
   createOrder,
+  listOrders
 };

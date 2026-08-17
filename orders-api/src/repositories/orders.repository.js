@@ -1,11 +1,11 @@
 const pool = require('../database/postgres.js')
 
-const saveOrder = async ({ items, total, uuid }) => {
+const saveOrder = async ({ items, total, uuid, user_id }) => {
     try {
-        const query = `INSERT INTO orders (id, items, total) 
-                        VALUES ($1, $2::jsonb, $3) 
+        const query = `INSERT INTO orders (id, items, total, user_id) 
+                        VALUES ($1, $2::jsonb, $3, $4) 
                         RETURNING id, items, total, created_at, updated_at`;
-        const params = [uuid, JSON.stringify(items), total];
+        const params = [uuid, JSON.stringify(items), total, user_id];
         const result = await pool.query(query, params);
 
         return result.rows[0]
@@ -45,7 +45,22 @@ const getPricesByVariants = async (items) => {
     return itemsWithPrice;
 }
 
+const listOrders = async (userId) => {
+    const result = await pool.query(`
+        SELECT
+            id,
+            items,
+            total,
+            created_at
+        FROM orders
+        WHERE user_id = $1;
+    `, [userId]);
+
+    return result.rows;
+}
+
 module.exports = {
     saveOrder,
-    getPricesByVariants
+    getPricesByVariants,
+    listOrders
 };
