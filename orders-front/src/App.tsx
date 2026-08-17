@@ -9,6 +9,7 @@ import Login from './pages/login/login'
 import Register from './pages/register/register'
 import Cart from './pages/cart/cart'
 import Favorites from './pages/favorites/favorites'
+import Orders from './pages/orders/orders'
 import ProtectedRoute from './components/protected-route/protected-route'
 
 function AppRoutes() {
@@ -27,6 +28,7 @@ function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<Cart />} />
+          <Route path="/orders" element={<Orders />} />
         </Route>
       </Routes>
       {!hideHeader && <Footer />}

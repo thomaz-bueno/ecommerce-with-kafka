@@ -174,7 +174,10 @@ function Product() {
           setIsModalOpen(false)
           navigate('/cart')
         }}
-        onContinueShopping={() => setIsModalOpen(false)}
+        onContinueShopping={() => {
+          setIsModalOpen(false)
+          navigate('/')
+        }}
       />
 
       <RemoveConfirmationModal

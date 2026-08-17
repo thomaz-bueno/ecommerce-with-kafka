@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import CartItem from '../../components/cart-item/cart-item'
 import RemoveConfirmationModal from '../../components/modal-remove-confirmation/remove-confirmation-modal'
 import OrderSuccessModal from '../../components/order-success-modal/order-success-modal'
@@ -239,7 +239,9 @@ function Cart() {
                 'Finalizar pedido'
               )}
             </button>
-            <button className="checkout-btn member-btn">Continuar comprando</button>
+            <Link to="/">
+              <button className="checkout-btn member-btn">Continuar comprando</button>
+            </Link>
           </div>
         </div>
       </div>
