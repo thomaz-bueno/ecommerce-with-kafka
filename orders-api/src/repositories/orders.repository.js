@@ -53,7 +53,8 @@ const listOrders = async (userId) => {
             total,
             created_at
         FROM orders
-        WHERE user_id = $1;
+        WHERE user_id = $1
+        ORDER BY created_at DESC;
     `, [userId]);
 
     return result.rows;
