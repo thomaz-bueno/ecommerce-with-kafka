@@ -56,7 +56,7 @@ function Cart() {
   function handleConfirmRemove() {
     if (!itemToRemove) return
 
-    fetch(`${import.meta.env.VITE_API_URL}/cart/remove/${itemToRemove.id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/cart/remove/${itemToRemove.product_id}`, {
       method: 'DELETE',
       credentials: 'include',
     })
@@ -64,6 +64,7 @@ function Cart() {
       .then((data) => {
         if (data.status === 'removed') {
           setItems((prev) => prev.filter((item) => item.id !== itemToRemove.id))
+          fetchCart()
         }
       })
       .catch((err) => console.error(err))
@@ -101,6 +102,7 @@ function Cart() {
       .then((data) => {
         if (data.status === 'cleared') {
           setItems([])
+          fetchCart()
         }
       })
       .catch((err) => console.error(err))
