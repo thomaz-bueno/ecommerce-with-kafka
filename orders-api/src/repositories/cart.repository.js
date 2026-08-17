@@ -52,8 +52,8 @@ const getCartItemById = async ( user_id, product_id ) => {
     const result = await pool.query(`
         SELECT id, user_id, product_id, name, price, color, size, quantity
         FROM cart
-        WHERE user_id = $1::UUID AND product_id = $2;
-    `, [user_id, product_id]);
+        WHERE user_id = $1::UUID AND product_id = $2::INTEGER;
+    `, [user_id, Number(product_id)]);
     
     return result.rows[0];
 };
